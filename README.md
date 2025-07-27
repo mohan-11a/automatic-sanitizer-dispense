@@ -38,4 +38,18 @@ void loop() {
     delay(2000);
   }
 }
+## 🎓 Academic Information
+
+- 🔬 **Semester**: 4th Semester (Minor Project)
+- 🏫 **College**: Aditya Engineering college
+- 🎓 **Branch**: Electronics and Communication Engineering
+- 👨‍💻 **Developed by**: Mohan Pulla
+## these are the images and project assemble and testing videos
+
+
+https://github.com/user-attachments/assets/b6aeeeee-961c-48c1-9786-5c259d464351
+
+![maxresdefault](https://github.com/user-attachments/assets/fd7a6888-ed66-41ba-a55d-dc6d3b6fbc9f)
+
+
 
