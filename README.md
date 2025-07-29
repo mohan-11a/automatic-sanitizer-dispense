@@ -1,43 +1,85 @@
-# Automatic Sanitizer Dispenser
+# Automatic Hand Sanitizer Dispenser
 
-An Arduino-based contactless hand sanitizer dispenser developed using IR sensor and servo motor.
+An Arduino-based contactless hand sanitizer dispenser using an ultrasonic sensor for hand detection and a potentiometer to control the quantity of sanitizer dispensed through a relay-controlled motor.
+
+---
 
 ## 🧾 Project Description
 
-This project is a **contactless automatic hand sanitizer dispenser** designed and implemented using an **Arduino Uno**, **IR sensor**, and **servo motor**. The dispenser detects the presence of a hand using the IR sensor and activates a servo motor to press a sanitizer bottle pump, dispensing a small amount of sanitizer without any physical touch.
+This project implements a fully automatic and contactless sanitizer dispenser using **Arduino Uno**, **ultrasonic sensor**, **potentiometer**, **relay**, and **DC motor**. The ultrasonic sensor detects the user's hand near the dispenser, and based on the potentiometer setting, the system controls how much sanitizer is dispensed.
+
+---
 
 ## 🔧 Components Used
-- Arduino Uno
-- IR Sensor
-- Servo Motor
-- Jumper Wires
-- Sanitizer Bottle
+
+- Arduino Uno  
+- Ultrasonic Sensor (HC-SR04)  
+- Potentiometer  
+- Relay Module  
+- DC Motor / Pump  
+- Jumper Wires  
+- Sanitizer Bottle  
+- Power Supply (Battery or Adapter)
+
+---
 
 ## 💡 How It Works
-The IR sensor detects a nearby hand. When detection is made, the Arduino triggers the servo motor to rotate, pressing the sanitizer pump and dispensing liquid.
+
+1. The **ultrasonic sensor** continuously measures the distance in front of it.
+2. When a hand is detected within a certain range (e.g., < 10 cm), the **Arduino** triggers the **relay** to activate the **DC motor**.
+3. The **potentiometer** is used to control the dispensing time, i.e., how long the motor runs (and hence, the quantity of sanitizer).
+4. After the set duration, the motor turns off automatically.
+
+---
 
 ## 📜 Arduino Code
+
 ```cpp
-#include <Servo.h>
-Servo servo;
-int irSensor = 2;
-int value = 0;
+#define TRIG 9
+#define ECHO 8
+#define RELAY 7
+#define POT A0
 
 void setup() {
-  servo.attach(9);
-  pinMode(irSensor, INPUT);
-  servo.write(0);
+  pinMode(TRIG, OUTPUT);
+  pinMode(ECHO, INPUT);
+  pinMode(RELAY, OUTPUT);
+  pinMode(POT, INPUT);
+  digitalWrite(RELAY, LOW);
+  Serial.begin(9600);
 }
 
 void loop() {
-  value = digitalRead(irSensor);
-  if (value == 0) {
-    servo.write(90);
-    delay(1000);
-    servo.write(0);
-    delay(2000);
+  long duration;
+  int distance;
+  int potValue = analogRead(POT);             // Read potentiometer
+  int dispenseTime = map(potValue, 0, 1023, 500, 3000); // Map to 0.5 to 3 seconds
+
+  // Trigger ultrasonic
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  duration = pulseIn(ECHO, HIGH);
+  distance = duration * 0.034 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.print(" cm  |  Dispense Time: ");
+  Serial.println(dispenseTime);
+
+  if (distance > 0 && distance < 10) {
+    digitalWrite(RELAY, HIGH);     // Turn on motor
+    delay(dispenseTime);           // Based on potentiometer
+    digitalWrite(RELAY, LOW);      // Turn off motor
+    delay(2000);                   // Wait before next detection
   }
+
+  delay(100);
 }
+
 ## 🎓 Academic Information
 
 - 🔬 **Semester**: 4th Semester (Minor Project)
